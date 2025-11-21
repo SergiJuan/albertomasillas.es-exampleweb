@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Empleados - AlbertoMasillas.es</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #f8f9fa;
+            --accent: #8b5a2b;
+            --accent-light: #a87c4c;
+            --text: #333333;
+            --light-text: #777777;
+            --white: #ffffff;
+            --border: #eaeaea;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            background-color: #f5f7fa;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary);
+            color: white;
+            padding: 2rem 0;
+            transition: var(--transition);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .logo-text span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0 1rem;
+        }
+
+        .nav-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            color: #ccc;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-links a i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+            transition: var(--transition);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            border-left: 4px solid var(--accent);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background-color: rgba(139, 90, 43, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 0.2rem;
+            color: var(--primary);
+        }
+
+        .stat-info p {
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-card h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .orders-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .orders-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .orders-header h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .orders-table th, .orders-table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .orders-table th {
+            background-color: var(--secondary);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status.processing {
+            background-color: #cce7ff;
+            color: #004085;
+        }
+
+        .status.shipped {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status.delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .progress-container {
+            margin-top: 2rem;
+        }
+
+        .progress-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+                overflow: visible;
+            }
+            
+            .logo-text, .nav-links span {
+                display: none;
+            }
+            
+            .logo {
+                justify-content: center;
+                padding: 0 0 2rem;
+            }
+            
+            .logo-icon {
+                margin-right: 0;
+                font-size: 1.8rem;
+            }
+            
+            .nav-links a {
+                justify-content: center;
+                padding: 1rem;
+            }
+            
+            .nav-links a i {
+                margin-right: 0;
+                font-size: 1.4rem;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 1rem 0;
+            }
+            
+            .logo {
+                padding: 0 1rem 1rem;
+                justify-content: flex-start;
+            }
+            
+            .logo-text {
+                display: block;
+            }
+            
+            .nav-links {
+                display: flex;
+                overflow-x: auto;
+                padding: 0 1rem;
+            }
+            
+            .nav-links li {
+                margin-bottom: 0;
+                margin-right: 0.5rem;
+            }
+            
+            .nav-links a {
+                white-space: nowrap;
+                padding: 0.8rem 1rem;
+            }
+            
+            .nav-links span {
+                display: block;
+                margin-left: 0.5rem;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <span class="logo-icon">🪑</span>
+            <span class="logo-text">Alberto<span>Masillas</span></span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="active"><i>📊</i> <span>Dashboard</span></a></li>
+            <li><a href="#"><i>📦</i> <span>Pedidos</span></a></li>
+            <li><a href="#"><i>👥</i> <span>Clientes</span></a></li>
+            <li><a href="#"><i>📈</i> <span>Inventario</span></a></li>
+            <li><a href="#"><i>💰</i> <span>Ventas</span></a></li>
+            <li><a href="#"><i>⚙️</i> <span>Configuración</span></a></li>
+            <li><a href="albertomasillas.html"><i>🌐</i> <span>Volver al Sitio</span></a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Panel de Empleados</h1>
+            <div class="user-info">
+                <div class="user-avatar">AM</div>
+                <div>
+                    <div style="font-weight: 600;">Administrador</div>
+                    <div style="font-size: 0.8rem; color: var(--light-text);">Alberto Masillas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-info">
+                    <h3>€12,458</h3>
+                    <p>Ingresos del Mes</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-info">
+                    <h3>42</h3>
+                    <p>Pedidos Activos</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <h3>128</h3>
+                    <p>Clientes Nuevos</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-info">
+                    <h3>4.8</h3>
+                    <p>Valoración Media</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-container">
+            <div class="chart-card">
+                <h3>Ventas Mensuales</h3>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Productos Más Vendidos</h3>
+                <div class="chart-container">
+                    <canvas id="productsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="charts-container">
+            <div class="chart-card">
+                <h3>Progreso de Producción</h3>
+                <div class="progress-container">
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>Silla Moderna</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>Silla Ejecutiva</span>
+                            <span>45%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>Silla Minimalista</span>
+                            <span>90%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>Silla Vintage</span>
+                            <span>30%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 30%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Estado de Pedidos</h3>
+                <div class="chart-container">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="orders-container">
+            <div class="orders-header">
+                <h3>Pedidos Recientes</h3>
+                <button class="btn">Ver Todos</button>
+            </div>
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>ID Pedido</th>
+                        <th>Cliente</th>
+                        <th>Producto</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#AM-4821</td>
+                        <td>María López</td>
+                        <td>Silla Ejecutiva</td>
+                        <td>15 Oct, 2023</td>
+                        <td>€399</td>
+                        <td><span class="status delivered">Entregado</span></td>
+                    </tr>
+                    <tr>
+                        <td>#AM-4820</td>
+                        <td>Carlos Rodríguez</td>
+                        <td>Silla Moderna</td>
+                        <td>14 Oct, 2023</td>
+                        <td>€249</td>
+                        <td><span class="status shipped">Enviado</span></td>
+                    </tr>
+                    <tr>
+                        <td>#AM-4819</td>
+                        <td>Ana Martínez</td>
+                        <td>Silla Minimalista</td>
+                        <td>13 Oct, 2023</td>
+                        <td>€189</td>
+                        <td><span class="status processing">Procesando</span></td>
+                    </tr>
+                    <tr>
+                        <td>#AM-4818</td>
+                        <td>Javier García</td>
+                        <td>Silla Ejecutiva</td>
+                        <td>12 Oct, 2023</td>
+                        <td>€399</td>
+                        <td><span class="status pending">Pendiente</span></td>
+                    </tr>
+                    <tr>
+                        <td>#AM-4817</td>
+                        <td>Laura Fernández</td>
+                        <td>Silla Moderna</td>
+                        <td>11 Oct, 2023</td>
+                        <td>€249</td>
+                        <td><span class="status delivered">Entregado</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Sales Chart
+        const salesCtx = document.getElementById('salesChart').getContext('2d');
+        const salesChart = new Chart(salesCtx, {
+            type: 'line',
+            data: {
+                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct'],
+                datasets: [{
+                    label: 'Ventas (€)',
+                    data: [8500, 9200, 7800, 11000, 10500, 12000, 11500, 13000, 12500, 12458],
+                    borderColor: '#8b5a2b',
+                    backgroundColor: 'rgba(139, 90, 43, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Products Chart
+        const productsCtx = document.getElementById('productsChart').getContext('2d');
+        const productsChart = new Chart(productsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Silla Moderna', 'Silla Ejecutiva', 'Silla Minimalista', 'Silla Vintage'],
+                datasets: [{
+                    data: [35, 25, 30, 10],
+                    backgroundColor: [
+                        '#8b5a2b',
+                        '#a87c4c',
+                        '#c9a87c',
+                        '#e6d5b8'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Orders Chart
+        const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+        const ordersChart = new Chart(ordersCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Pendientes', 'Procesando', 'Enviados', 'Entregados'],
+                datasets: [{
+                    data: [5, 12, 8, 17],
+                    backgroundColor: [
+                        '#fff3cd',
+                        '#cce7ff',
+                        '#d1ecf1',
+                        '#d4edda'
+                    ],
+                    borderColor: [
+                        '#856404',
+                        '#004085',
+                        '#0c5460',
+                        '#155724'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Simulate progress animation
+        document.querySelectorAll('.progress-fill').forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = width;
+            }, 500);
+        });
+    </script>
+</body>
+</html>
